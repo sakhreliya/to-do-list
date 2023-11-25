@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage Example</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <label for="fname">First Name:</label>
+    <input type="text" id="fname"><br><br>
+    <label for="lname">Last Name:</label>
+    <input type="text" id="lname"><br><br>
+    <button onclick="saveData()">Save</button><br><br>
+    <button onclick="clearData()">Clear</button><br><br>
+
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+    </table>
+    <script>
+
+        let data = JSON.parse(localStorage.getItem("data")) || [];
+
+        function saveData() {
+            let fname = document.getElementById("fname").value;
+            let lname = document.getElementById("lname").value;
+
+            const entry = {
+                firstName: fname,
+                lastName: lname,
+            };
+
+            data.push(entry);
+
+            localStorage.setItem("data", JSON.stringify(data));
+
+            document.getElementById("fname").value = "";
+            document.getElementById("lname").value = "";
+
+            updateTable();
+        }
+
+        function deleteEntry(index) {
+            data.splice(index, 1);
+            localStorage.setItem("data", JSON.stringify(data));
+            updateTable();
+        }
+
+        function clearData() {
+            localStorage.removeItem("data");
+            data = [];
+            updateTable();
+        }
+
+        function updateEntry(index) {
+            let updatedFname = prompt("Enter first name:");
+            let updatedLname = prompt("Enter last name:");
+
+            if (updatedFname !== null && updatedLname !== null) {
+                data[index].firstName = updatedFname;
+                data[index].lastName = updatedLname;
+
+                localStorage.setItem("data", JSON.stringify(data));
+
+                updateTable();
+            }
+        }
+
+        function updateTable() {
+            const tableBody = document.getElementById("table-body");
+            tableBody.innerHTML = "";
+
+            data.forEach((entry, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index}</td>
+                    <td>${entry.firstName}</td>
+                    <td>${entry.lastName}</td>
+                    <td>
+                        <button onclick="deleteEntry(${index})">Delete</button>
+                        <button onclick="updateEntry(${index})">Update</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        updateTable();
+
+    </script>
+
+</body>
+
+</html>
